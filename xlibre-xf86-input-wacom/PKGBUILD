@@ -1,0 +1,40 @@
+# Maintainer: artist for Artix Linux
+
+pkgname=xlibre-xf86-input-wacom
+_pkgname=xf86-input-wacom
+pkgver=1.2.3.1
+pkgrel=1
+pkgdesc="XLibre fork of X.Org Wacom tablet driver"
+arch=(x86_64)
+url="https://github.com/X11Libre"
+license=('GPL-2.0-or-later')
+depends=('libxi' 'libxinerama' 'libxrandr' 'libudev' 'libx11' 'glibc')
+makedepends=('xorg-server-devel' 'X-ABI-XINPUT_VERSION=26.0' 'meson' 'gobject-introspection'
+            # for tests:
+            'python-libevdev' 'python-pytest' 'python-yaml' 'python-gobject' 'python-attrs')
+conflicts=("$_pkgname" 'xorg-server<21.1.1' 'X-ABI-XINPUT_VERSION<26' 'X-ABI-XINPUT_VERSION>=27')
+provides=("$_pkgname")
+replaces=("$_pkgname")
+source=("${url}/${_pkgname}/archive/refs/tags/${pkgname}-${pkgver}.tar.gz")
+groups=('xlibre-drivers')
+
+build() {
+  meson ${_pkgname}-${pkgname}-${pkgver} build \
+    --prefix=/usr \
+    --libexecdir=lib \
+    -D xorg-conf-dir=/usr/share/X11/xorg.conf.d/ \
+    -D unittests=enabled
+
+  meson configure build
+  ninja -C build
+}
+
+check() {
+  meson test -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" ninja -C build install
+}
+
+sha256sums=('961f7b229e79e585a85b59be395e54392c00a3766204de95af832d2fa59207ed')

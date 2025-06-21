@@ -1,0 +1,32 @@
+# Maintainer: artist for Artix Linux
+
+pkgname=xlibre-xf86-input-evdev
+_pkgname=xf86-input-evdev
+pkgver=2.11.0.1
+pkgrel=1
+pkgdesc="XLibre fork of X.Org evdev input driver"
+arch=(x86_64)
+url="https://github.com/X11Libre"
+license=('HPND-sell-variant AND MIT')
+depends=('xlibre-xserver' 'libudev' 'mtdev' 'libevdev' 'glibc')
+makedepends=('xlibre-xserver-devel' 'X-ABI-XINPUT_VERSION=26.0' 'xorgproto')
+conflicts=(${_pkgname})
+provides=(${_pkgname})
+replaces=(${_pkgname})
+groups=('xlibre-drivers')
+source=("${url}/${_pkgname}/archive/refs/tags/${pkgname}-${pkgver}.tar.gz")
+
+build() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  ./autogen.sh
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 "${srcdir}"/${_pkgname}-${pkgname}-${pkgver}/COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+}
+
+sha256sums=('960c13c202dcb029dc15806dd9cff98a773cbc5aa6c20a1c9a53e35ed6d74bef')

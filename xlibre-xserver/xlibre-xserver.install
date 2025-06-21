@@ -1,0 +1,32 @@
+post_upgrade() {
+  cat <<MSG1
+>>> The Xlibre packages are currently supplied for testing.
+
+    For more information about Xlibre on Artix Linux visit our WiKi page:
+        https://wiki.artixlinux.org/Site/XlibreOnArtix
+
+MSG1
+}
+
+post_install() {
+  post_upgrade
+  cat <<MSG2
+>>> Manual action required
+    ----------------------
+    It is required to replace all installed xf86* xorg driver
+    packages with their xlibre-xf86* counterparts before starting
+    xlibe-xsever. So if for example xf86-video-intel has been
+    installed it should be replaced with xlibre-xf86-video-intel.
+
+    --
+
+    xorg-server has now the ability to run without root rights with
+    the help of systemd-logind. xserver will fail to run if not launched
+    from the same virtual terminal as was used to log in.
+    Without root rights, log files will be in ~/.local/share/xorg/ directory.
+
+    Old behavior can be restored through Xorg.wrap config file.
+    See Xorg.wrap man page (man xorg.wrap).
+MSG2
+}
+

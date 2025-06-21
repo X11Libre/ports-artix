@@ -1,0 +1,42 @@
+# Maintainer: artist for Artix Linux
+
+pkgname=xlibre-xf86-video-fbdev
+_pkgname=xf86-video-fbdev
+pkgver=0.5.1.1
+pkgrel=1
+pkgdesc="XLibre fork of framebuffer video driver"
+arch=(x86_64)
+license=('X11')
+url="https://github.com/X11Libre"
+depends=('glibc')
+makedepends=('xlibre-xserver-devel' 'X-ABI-VIDEODRV_VERSION=28.0')
+conflicts=(${_pkgname} 'X-ABI-VIDEODRV_VERSION<28' 'X-ABI-VIDEODRV_VERSION>=29')
+provides=(${_pkgname})
+replaces=(${_pkgname})
+source=("${url}/${_pkgname}/archive/refs/tags/${pkgname}-${pkgver}.tar.gz")
+groups=('xlibre-drivers')
+
+
+build() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/-Wl,-z,now}
+
+  ./autogen.sh
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  make check
+}
+
+package() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 "${srcdir}"/${_pkgname}-${pkgname}-${pkgver}/COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+}
+
+sha256sums=('53ac49f9fa892719ea14a48b013a8d6a06d96bd5cd80046d99ec0dcd89dabb5f')

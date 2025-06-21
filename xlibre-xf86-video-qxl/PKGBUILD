@@ -1,0 +1,40 @@
+# Maintainer: artist for Artix Linux
+
+pkgname=xlibre-xf86-video-qxl
+_pkgname=xf86-video-qxl
+pkgver=0.1.6.1
+pkgrel=1
+pkgdesc='XLibre fork of X.Org X11 qxl video driver'
+arch=('x86_64')
+url="https://github.com/X11Libre"
+license=('MIT')
+groups=('xlibre-drivers')
+depends=('spice' 'libudev' 'libxfont2' 'glibc')
+optdepends=('python: for Xspice')
+makedepends=('xlibre-xserver-devel' 'X-ABI-VIDEODRV_VERSION=28.0' 'spice-protocol'
+             'xorgproto' 'libcacard')
+conflicts=(${_pkgname} 'X-ABI-VIDEODRV_VERSION<28' 'X-ABI-VIDEODRV_VERSION>=29')
+provides=(${_pkgname})
+replaces=(${_pkgname})
+source=("${url}/${_pkgname}/archive/refs/tags/${pkgname}-${pkgver}.tar.gz")
+
+build() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/-Wl,-z,now}
+
+  autoreconf -fi
+  ./configure --enable-xspice --prefix=/usr
+  make
+}
+
+package() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}/" install
+
+  install -v -Dm0755 scripts/Xspice "${pkgdir}"/usr/bin/Xspice
+  install -Dm644 "${srcdir}"/${_pkgname}-${pkgname}-${pkgver}/COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+}
+
+sha256sums=('a9bd98c9126428b084a8409f01e8486f59bc8d91bb38029453f4b2365303c498')

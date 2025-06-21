@@ -1,0 +1,36 @@
+# Maintainer: artist for Artix Linux
+
+pkgname=xlibre-xf86-video-vesa
+_pkgname=xf86-video-vesa
+pkgver=2.6.0.1
+pkgrel=1
+pkgdesc="XLibre fork of X.Org vesa video driver"
+arch=(x86_64)
+license=('MIT')
+url="https://github.com/X11Libre"
+depends=('glibc')
+makedepends=('xlibre-xserver-devel' 'X-ABI-VIDEODRV_VERSION=28.0')
+conflicts=(${_pkgname} 'X-ABI-VIDEODRV_VERSION<28' 'X-ABI-VIDEODRV_VERSION>=29')
+provides=(${_pkgname})
+replaces=(${_pkgname})
+source=("${url}/${_pkgname}/archive/refs/tags/${pkgname}-${pkgver}.tar.gz")
+groups=('xlibre-drivers' 'xlibre')
+
+build() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/-Wl,-z,now}
+
+  ./autogen.sh
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  install -Dm644 "${srcdir}"/${_pkgname}-${pkgname}-${pkgver}/COPYING "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+}
+
+sha256sums=('15f858fa325fc6366577e095f968470d2575e8d4a5feeeaf9e9dbaf891703ba9')

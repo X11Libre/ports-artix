@@ -1,0 +1,38 @@
+# Maintainer: artist for Artix Linux
+
+pkgname=xlibre-xf86-video-nouveau
+_pkgname=xf86-video-nouveau
+pkgver=1.0.18.1
+pkgrel=1
+pkgdesc="XLibre fork of X.Org Open Source 3D acceleration driver for nVidia cards"
+arch=('x86_64')
+url="https://github.com/X11Libre"
+license=('MIT')
+depends=('mesa' 'libdrm' 'glibc')
+makedepends=('xlibre-xserver-devel' 'X-ABI-VIDEODRV_VERSION=28.0')
+conflicts=(${_pkgname} 'xorg-server<21.1.1' 'X-ABI-VIDEODRV_VERSION<28' 'X-ABI-VIDEODRV_VERSION>=29')
+provides=(${_pkgname})
+replaces=(${_pkgname})
+groups=('xlibre-drivers')
+source=("${url}/${_pkgname}/archive/refs/tags/${pkgname}-${pkgver}.tar.gz")
+
+build() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  export CFLAGS=${CFLAGS/-fno-plt}
+  export CXXFLAGS=${CXXFLAGS/-fno-plt}
+  export LDFLAGS=${LDFLAGS/-Wl,-z,now}
+
+  ./autogen.sh
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd ${_pkgname}-${pkgname}-${pkgver}
+  make DESTDIR="$pkgdir" install
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}
+
+sha256sums=('5db8a77b4e24af7d74f2e08b6eb27959230b210cf2baf486c43f1defc0406611')

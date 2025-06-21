@@ -1,0 +1,24 @@
+post_upgrade() {
+  if (( $(vercmp $2 1.16.0-3) < 0 )); then
+    post_install
+  fi
+}
+
+post_install() {
+  cat <<MSG
+>>> MANUAL ACTION REQUIRED:
+    ================================
+    This package is experimental and not yet supported. It should only be used
+    on spare test systems. If that is not the case then (re)install xorg-server
+    for now.
+
+    When using this package it is required to replace all installed xf86* xorg
+    driver packages with their xlibre-xf86* counterparts before restarting
+    xorg-sever! So if for example xf86-video-intel has been installed it
+    should be replaced with xlibre-xf86-video-intel.
+
+    For more information about using Xlibre on Artix visit web page:
+        https://wiki.artixlinux.org/Site/XlibreOnArtix
+MSG
+}
+
